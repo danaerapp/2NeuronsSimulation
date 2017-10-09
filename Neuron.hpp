@@ -4,7 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
-#include "Constantes.hpp"
+#include <vector>
 
 class Neuron{
 	
@@ -23,6 +23,10 @@ class Neuron{
 		double spikesNumber;
 		std::vector<double> times;
 		
+		int i; //SON numéro dans le network
+		
+		double J;
+		
 		int temps_pause; //For the refractory time after a spike, in nb of steps
 		
 		int clock_; //in nb of steps (not in seconds)
@@ -37,6 +41,7 @@ class Neuron{
 		double getPotential() const;
 		double getSpikesNumber() const;
 		double getTime(unsigned int i) const;
+		std::vector<int> getNeighbours() const;
 		
 		bool isRefractory_;
 		

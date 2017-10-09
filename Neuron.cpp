@@ -12,8 +12,10 @@ double Neuron::getTime(unsigned int i) const{
 	return times[i];
 }
 
+vector<int> Neuron::getNeighbours()const{
+	
+}
 
-		
 void Neuron::setPotential(double i){
 	potential =i;
 }
@@ -42,7 +44,7 @@ void Neuron::update(double Current){
 	}else{ 
 		//Calcul du potentiel
 		double new_potential(0.0);
-		new_potential=exphtau*potential+Current*R*(1-exphtau);
+		new_potential=exphtau*potential+Current*R*(1-exphtau) + J;
 		
 		if (new_potential >= Vth){ //Le neurone spike
 			addTime(clock_);
@@ -55,7 +57,7 @@ void Neuron::update(double Current){
 }
 
 Neuron::Neuron()
-: potential(Vreset),spikesNumber(0.0),temps_pause(0.0), clock_(0.0), isRefractory_(false)
+: potential(Vreset),spikesNumber(0.0),temps_pause(0.0), clock_(0.0), isRefractory_(false), J(0.0)
 {
 	times.clear();
 }

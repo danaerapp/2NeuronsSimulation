@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include "Constantes.hpp"
 #include "Neuron.hpp"
+#include "Network.hpp"
 
 using namespace std;
 
@@ -25,6 +25,8 @@ int main(){
 
 	Neuron neurone1;
 	Neuron neurone2;
+	
+	Network network;
 	
 	int nb_steps(t_stop/Neuron::h); //0.1ms est notre pas de temps
 	

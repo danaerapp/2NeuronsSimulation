@@ -41,8 +41,6 @@ int main(){
 			cerr<< "Erreur d'ouverture du fichier" << endl;
 		}else{
 			
-			//sortie << "t = " << t << " : " << endl;
-			
 			for (size_t i(0);i<all.size();++i){
 					
 					if ( (all[i].getPotential() >= Neuron::Vth) and not(all[i].isRefractory())){//Si le neurone spike et qu'il n'est pas en période réfractaire --> il envoi un signal à ses "voisins"
@@ -50,8 +48,8 @@ int main(){
 						vector<int> targets(network.getTargets(i));//Vector contenant les neurones pouvant recevoir le signal
 						
 						for (size_t j(0); j<targets.size();++j){
-							//sortie << "Transmission de " << i << " à " << targets[j] << endl;
-							all[targets[j]].receive(all[i].getPotential(),t); //Transmission du potentiel post synaptique, les targets reçoive un PSP et enregistre le temps de transmission
+							///cout << "Transmission au temps " << t*Neuron::h << endl; Test
+							all[targets[j]].receive(all[i].getPotential(), Neuron::delay); //Transmission du potentiel post synaptique, les targets reçoive un PSP et enregistre le temps de transmission
 						}
 						
 						all[i].update(ExtCurrent);
@@ -60,11 +58,9 @@ int main(){
 						if (i==0){
 							all[i].update(ExtCurrent);
 						}else{
-							all[i].update(0.0); //Pour l'instant nous voulons que le deuxième neurone réagisse uniquement au courant post synaptique
+							all[i].update(0.0); //Pour l'instant nous voulons que le deuxième neurone réagisse uniquement au courant post synaptique et le premier uniquement au courant externe imposé
+							sortie << all[i].getPotential() << endl;
 						}
-					}
-					if (i==1){
-						sortie << all[i].getPotential() << endl;
 					}
 			}
 		}

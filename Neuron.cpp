@@ -39,6 +39,8 @@ void Neuron::update(double Current){
 	
 	++clock_;
 	
+	bufferUpdate();
+	
 	if (temps_pause > 0){ //Neuron is refractory
 		--temps_pause; //h est notre pas de temps
 		
@@ -47,9 +49,10 @@ void Neuron::update(double Current){
 			
 		}
 		
-	}else if ( (PSP > 0.0) ){ ///For now we consider that the transmission is immediate
-		potential=exphtau*potential+PSP*(1-exphtau) + J; //Since I =V/R quand V est constant
-		PSP=0.0; //Reset the PSP
+	}else if (buffer[0] > 0.0){
+		potential=Neuron::exphtau*potential+Current*(1-exphtau) + 0.5*buffer[0]; //On prend que J = 0.5*le potentiel post synaptique
+		///std::cout << "Réception au temps " << clock_*h << std::endl; Test
+		buffer[0] -= buffer[0]; //Reset the PSP
 	}else{
 		//Calcul du potentiel
 		double new_potential(0.0);
@@ -65,12 +68,20 @@ void Neuron::update(double Current){
 	}
 }
 
-void Neuron::receive(double potential, int time){
-	PSP += potential;//The neurone receives the potential of an other neuron's spike
+void Neuron::bufferUpdate(){
+	
+	for (size_t i(0); i < buffer.size()-1 ;++i){
+		buffer[i] = buffer[i+1]; //On décale tout et insert un 0 à la fin
+	}
+	buffer[buffer.size()-1] = 0.0;
+}
+
+void Neuron::receive(double p, int t){
+	buffer[t-1]+=p; //The neurone receives the potential of an other neuron's spike
 }
 
 Neuron::Neuron()
-: potential(Vreset),spikesNumber(0.0),temps_pause(0.0), clock_(0), J(0.0), PSP(0.0)
+: potential(Vreset),spikesNumber(0.0),temps_pause(0.0), clock_(0), PSP(0.0), buffer({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0})
 {
 	times.clear();
 }

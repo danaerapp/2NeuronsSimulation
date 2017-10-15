@@ -17,15 +17,14 @@ class Neuron{
 		const double Erepos = 0.0; //milliVolts
 		const double Vreset = 0.0; //milliVolts, potentiel de repos
 		const double exphtau = exp(-h/tau); //Constante dont on a besoin pour calculer le nouveau potentiel
-	
+		
 	//Attributs
 		double potential;
 		double spikesNumber;
 		std::vector<double> times;
 		
-		int i; //SON numéro dans le network
-		
-		double J;
+		double J;//current weight, post synaptic potential amplitude (PSP amplitude)
+		double PSP;//post synaptic potential
 		
 		int temps_pause; //For the refractory time after a spike, in nb of steps
 		
@@ -39,17 +38,19 @@ class Neuron{
 		static constexpr double R = 20.0; //picoFarad, tau/C = R 
 	
 		double getPotential() const;
+		double getPSP() const;
 		double getSpikesNumber() const;
 		double getTime(unsigned int i) const;
-		std::vector<int> getNeighbours() const;
 		
-		bool isRefractory_;
+		bool isRefractory() const;
 		
 		void setPotential(double i);
 		void addSpike(); //Ajout d'un spike
 		void addTime(double i);
 		
 		void update(double current);
+		
+		void receive(double PSP, int time);
 		
 		Neuron();
 		Neuron(double p, double s, std::vector<double> t);

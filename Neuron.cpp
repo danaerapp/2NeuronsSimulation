@@ -4,16 +4,16 @@ double Neuron::getPotential() const{
 	return potential;
 }
 
+double Neuron::getPSP() const{
+	return PSP;
+}
+
 double Neuron::getSpikesNumber() const{
 	return spikesNumber;
 }
 
 double Neuron::getTime(unsigned int i) const{
 	return times[i];
-}
-
-vector<int> Neuron::getNeighbours()const{
-	
 }
 
 void Neuron::setPotential(double i){
@@ -27,24 +27,33 @@ void Neuron::addSpike(){
 void Neuron::addTime(double i){
 	times.push_back(i);
 }
+	
+bool Neuron::isRefractory() const{
+	if ( (temps_pause > 0) and (potential > Vth) and (temps_pause < (tauRef/h))){ // Si temps_pause == tauRef, on veut encore que le neurone puisse transmettre sosn potentiel (et donc être considéré comme non-refractaire)
+		return true;
+	}
+	return false;
+}
 				
 void Neuron::update(double Current){
 	
 	++clock_;
 	
-	if (temps_pause > 0.0){ //Neuron is refractory
+	if (temps_pause > 0){ //Neuron is refractory
 		--temps_pause; //h est notre pas de temps
-		isRefractory_=true;
 		
-		if (temps_pause <= 0.0){
+		if (temps_pause <= 0){
 			potential=Vreset;
-			isRefractory_=false;
+			
 		}
 		
-	}else{ 
+	}else if ( (PSP > 0.0) ){ ///For now we consider that the transmission is immediate
+		potential=exphtau*potential+PSP*(1-exphtau) + J; //Since I =V/R quand V est constant
+		PSP=0.0; //Reset the PSP
+	}else{
 		//Calcul du potentiel
 		double new_potential(0.0);
-		new_potential=exphtau*potential+Current*R*(1-exphtau) + J;
+		new_potential=exphtau*potential+Current*R*(1-exphtau);
 		
 		if (new_potential >= Vth){ //Le neurone spike
 			addTime(clock_);
@@ -56,8 +65,12 @@ void Neuron::update(double Current){
 	}
 }
 
+void Neuron::receive(double potential, int time){
+	PSP += potential;//The neurone receives the potential of an other neuron's spike
+}
+
 Neuron::Neuron()
-: potential(Vreset),spikesNumber(0.0),temps_pause(0.0), clock_(0.0), isRefractory_(false), J(0.0)
+: potential(Vreset),spikesNumber(0.0),temps_pause(0.0), clock_(0), J(0.0), PSP(0.0)
 {
 	times.clear();
 }

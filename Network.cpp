@@ -3,40 +3,40 @@
 Network::Network()
 {
 	for(int i(0); i<nb_neurons;++i){
-		all_neurons.push_back(i);
+		all_neurons[i]=i;
 	}
 	
-	for (int i(0); i<nb_neurons;++i){
+	for (int i(0);i<nb_neurons;++i){ //par défaut, aucun n'est connecté
+		for (int j(0);j<nb_neurons;++j){
+			connection[i][j]=false;
+		}
+	}
+	
+	/*for (int i(0); i<nb_neurons;++i){
 		for (int j(0); j<nb_neurons;++j){
 			if (i!=j){
-				relation[i][j]=true; ///voisins aléatoirement attribués ?
+				connection[i][j]=...; 
+				///voisins aléatoirement attribués selon Connection=epsilon*NbNeurons
 			}
 		}
-	}
-}
-
-Network::~Network(){
-	for(int i(0); i<nb_neurons;++i){
-		delete all_neurons[i];
-	}
-	all_neurons.clear()
-}
-
-vector<int> Network::getNeighbours(int n) const{
+	}*/// Pour plus tard, quand nb_neurons > 2
+	//mais ici nous considérons seulement 2 neurones : 0 connecté à 1, 1 connecté à personne
 	
-	vector<int> Neighbours;
+	connection[0][1]=true;
+	connection[1][0]=false;
+}
+
+Network::~Network(){}
+
+std::vector<int> Network::getTargets(int n) const{
+	
+	std::vector<int> targets;
 	
 	for (int i(0); i<nb_neurons;++i){
-		if (relation[n][i]){
-			Neighbours.push_back(i);
+		if (connection[n][i]){
+			targets.push_back(i);
 		}
 	}
 	
-	return Neighbours;
-}
-
-void connect(int from, int to, double current_weight){
-	if (relation[from][to]){
-		
-	}
+	return targets;
 }

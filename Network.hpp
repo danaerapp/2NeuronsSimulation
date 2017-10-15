@@ -6,15 +6,15 @@
 
 class Network{
 	private:
-		array<int , nb_neurons> all_neurons;
-		array<array<bool,nb_neurons>, nb_neurons> relation;
+	
+		static constexpr int nb_neurons = 2;
+	
+		std::array<int , nb_neurons> all_neurons;
+		std::array<std::array<bool,nb_neurons>, nb_neurons> connection; //Matrice carrée, si connection[i][j]=true --> i est connecté à j (et non l'inverse!)
 		
 	public:
-	
-		static constexpr nb_neurons = 2;
 		
-		vector<int> getNeighbours(int n) const;
-		void connect(int from, int to, double current_weight); //Transmettre un courant aux voisins après un spike 
+		std::vector<int> getTargets(int n) const;
 		
 		~Network();
 		Network();

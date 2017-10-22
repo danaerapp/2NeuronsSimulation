@@ -4,10 +4,6 @@ double Neuron::getPotential() const{
 	return potential;
 }
 
-double Neuron::getPSP() const{
-	return PSP;
-}
-
 double Neuron::getSpikesNumber() const{
 	return spikesNumber;
 }
@@ -39,9 +35,8 @@ void Neuron::update(double Current){
 	
 	++clock_;
 	
-	bufferUpdate();
-	
-	if (temps_pause > 0){ //Neuron is refractory
+	///Réfléchir à faire (clock_-tspike < tauRef), avec tspike=times.back()
+	if (temps_pause > 0){ //Neuron is refractory 
 		--temps_pause; //h est notre pas de temps
 		
 		if (temps_pause <= 0){
@@ -49,10 +44,10 @@ void Neuron::update(double Current){
 			
 		}
 		
-	}else if (buffer[0] > 0.0){
-		potential=Neuron::exphtau*potential+Current*(1-exphtau) + 0.5*buffer[0]; //On prend que J = 0.5*le potentiel post synaptique
-		///std::cout << "Réception au temps " << clock_*h << std::endl; Test
-		buffer[0] -= buffer[0]; //Reset the PSP
+	}else if (buffer[clock_%Dmax] > 0.0){ //Temps actuel modulo delay max+1 nous donne le nb de steps avant de recevoir le spike
+		potential=Neuron::exphtau*potential+Current*(1-exphtau) + buffer[clock_%Dmax];
+		std::cout << "Réception au temps " << clock_*h << std::endl; 
+		buffer[clock_%Dmax] =0.0 ; //Reset the PSP
 	}else{
 		//Calcul du potentiel
 		double new_potential(0.0);
@@ -68,26 +63,18 @@ void Neuron::update(double Current){
 	}
 }
 
-void Neuron::bufferUpdate(){
-	
-	for (size_t i(0); i < buffer.size()-1 ;++i){
-		buffer[i] = buffer[i+1]; //On décale tout et insert un 0 à la fin
-	}
-	buffer[buffer.size()-1] = 0.0;
-}
-
-void Neuron::receive(double p, int t){
-	buffer[t-1]+=p; //The neurone receives the potential of an other neuron's spike
+void Neuron::receive(double J, double D){
+	buffer[(Dmax+clock_)%Dmax]+=J; //The neurone receives the potential of an other neuron's spike, D/H : transforms in nb of steps
 }
 
 Neuron::Neuron()
-: potential(Vreset),spikesNumber(0.0),temps_pause(0.0), clock_(0), PSP(0.0), buffer({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0})
+: potential(Vreset), spikesNumber(0.0), temps_pause(0.0), clock_(0), Dmax(delay/h), buffer(Dmax,0.0)
 {
-	times.clear();
+	///assert(buffer.size() == delay+1);
 }
 
 Neuron::Neuron(double p, double s, std::vector<double> t)
-:potential(p), spikesNumber(s), temps_pause(0.0)
+:potential(p), spikesNumber(s), temps_pause(0.0), clock_(0), Dmax(delay/h), buffer(Dmax,0.0)
 {
 	for (unsigned int i(0); i<t.size();++i){
 		times[i]=t[i];

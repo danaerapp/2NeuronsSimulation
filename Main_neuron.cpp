@@ -49,7 +49,7 @@ int main(){
 						
 						for (size_t j(0); j<targets.size();++j){
 							///cout << "Transmission au temps " << t*Neuron::h << endl; Test
-							all[targets[j]].receive(all[i].getPotential(), Neuron::delay); //Transmission du potentiel post synaptique, les targets reçoive un PSP et enregistre le temps de transmission
+							all[targets[j]].receive(0.1, Neuron::delay); //Transmission du potentiel post synaptique, les targets reçoive un PSP et enregistre le temps de transmission, On prend J =0.1 ici
 						}
 						
 						all[i].update(ExtCurrent);

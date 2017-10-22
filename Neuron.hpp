@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+///#include <assert>
 
 class Neuron{
 	
@@ -17,14 +18,13 @@ class Neuron{
 		const double Erepos = 0.0; //milliVolts
 		const double Vreset = 0.0; //milliVolts, potentiel de repos
 		const double exphtau = exp(-h/tau); //Constante dont on a besoin pour calculer le nouveau potentiel
+		const int Dmax;
 		
 		
 	//Attributs
 		double potential;
 		double spikesNumber;
 		std::vector<double> times;
-		
-		double PSP;//current weight, post synaptic potential amplitude (PSP amplitude), called J in the paper
 		
 		int temps_pause; //For the refractory time after a spike, in nb of steps
 		
@@ -36,15 +36,13 @@ class Neuron{
 	
 	//Attributs de classe
 		static constexpr double h = 0.1; //milliseconds, laps de temps entre chaque mesures de potentiel
-		static constexpr double Vth = 20.0;
-		static constexpr double R = 20.0; //picoFarad, tau/C = R 
-		static constexpr double delay = 15; //nb of steps between a spike and the reception of this spike by a target neurone
+		static constexpr double Vth = 20.0; //threshold, spike potential
+		static constexpr double R = 20.0; //picoFarad, tau/C = R, resistance membranaire
+		static constexpr double delay = 1.5; //in ms, time between a spike and the reception of this spike by a target neurone
 	
 		double getPotential() const;
-		double getPSP() const;
 		double getSpikesNumber() const;
 		double getTime(unsigned int i) const;
-		void bufferUpdate();
 		
 		bool isRefractory() const;
 		
@@ -54,7 +52,7 @@ class Neuron{
 		
 		void update(double current);
 		
-		void receive(double PSP, int delay);
+		void receive(double J, double delay); // J :current weight, post synaptic potential amplitude 
 		
 		Neuron();
 		Neuron(double p, double s, std::vector<double> t);
